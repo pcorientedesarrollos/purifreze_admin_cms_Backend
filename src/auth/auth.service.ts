@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { compare, hash } from 'bcrypt';
+import { compare } from 'bcrypt';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -30,40 +30,53 @@ export class AuthService {
 
   verifyRequest(cookieHeader?: string): SessionPayload {
     const token = this.readCookie(cookieHeader, this.cookieName);
-    if (!token) throw new UnauthorizedException('Inicia sesión para continuar.');
+    if (!token)
+      throw new UnauthorizedException('Inicia sesión para continuar.');
     return this.verify(token);
   }
 
   createCookie(token: string): string {
     const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-    return `${this.cookieName}=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=28800${secure}`;
+    const sameSite = process.env.NODE_ENV === 'production' ? 'None' : 'Strict';
+    return `${this.cookieName}=${token}; HttpOnly; Path=/; SameSite=${sameSite}; Max-Age=28800${secure}`;
   }
 
   clearCookie(): string {
     const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-    return `${this.cookieName}=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0${secure}`;
-  }
-
-  hashPassword(password: string): Promise<string> {
-    return hash(password, 12);
+    const sameSite = process.env.NODE_ENV === 'production' ? 'None' : 'Strict';
+    return `${this.cookieName}=; HttpOnly; Path=/; SameSite=${sameSite}; Max-Age=0${secure}`;
   }
 
   private sign(payload: Omit<SessionPayload, 'exp'>): string {
     const body = Buffer.from(
-      JSON.stringify({ ...payload, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8 }),
+      JSON.stringify({
+        ...payload,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
+      }),
     ).toString('base64url');
     return `${body}.${this.signature(body)}`;
   }
 
   private verify(token: string): SessionPayload {
     const [body, signature] = token.split('.');
-    if (!body || !signature) throw new UnauthorizedException('La sesión no es válida.');
+    if (!body || !signature)
+      throw new UnauthorizedException('La sesión no es válida.');
     const expected = Buffer.from(this.signature(body));
     const actual = Buffer.from(signature);
-    if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
+    if (
+      expected.length !== actual.length ||
+      !timingSafeEqual(expected, actual)
+    ) {
       throw new UnauthorizedException('La sesión no es válida.');
     }
-    const payload = JSON.parse(Buffer.from(body, 'base64url').toString()) as SessionPayload;
+    let payload: SessionPayload;
+    try {
+      payload = JSON.parse(
+        Buffer.from(body, 'base64url').toString(),
+      ) as SessionPayload;
+    } catch {
+      throw new UnauthorizedException('La sesiÃ³n no es vÃ¡lida.');
+    }
     if (!payload.exp || payload.exp <= Math.floor(Date.now() / 1000)) {
       throw new UnauthorizedException('La sesión expiró.');
     }
