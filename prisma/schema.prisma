@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model ContentSection {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique @db.VarChar(80)
+  label       String   @db.VarChar(120)
+  title       String?  @db.VarChar(255)
+  description String?  @db.Text
+  content     Json?
+  sortOrder   Int      @default(0)
+  isVisible   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model BlogPost {
+  id            Int                    @id @default(autoincrement())
+  title         String                 @db.VarChar(255)
+  slug          String                 @unique @db.VarChar(255)
+  excerpt       String                 @db.Text
+  coverImageUrl String?                @db.VarChar(500)
+  blocks        Json
+  status        BlogPostStatus         @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  redirects     BlogPostSlugRedirect[]
+
+  @@index([status, publishedAt])
+}
+
+model BlogPostSlugRedirect {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique @db.VarChar(255)
+  postId    Int
+  createdAt DateTime @default(now())
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(80)
+  passwordHash String   @db.VarChar(255)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
