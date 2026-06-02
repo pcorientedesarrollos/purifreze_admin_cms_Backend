@@ -6,17 +6,57 @@ datasource db {
   provider = "mysql"
 }
 
-model ContentSection {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique @db.VarChar(80)
-  label       String   @db.VarChar(120)
-  title       String?  @db.VarChar(255)
-  description String?  @db.Text
-  content     Json?
-  sortOrder   Int      @default(0)
-  isVisible   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  videoUrl  String   @db.VarChar(500)
+  name      String   @db.VarChar(255)
+  label     String   @db.VarChar(255)
+  featured  Boolean  @default(false)
+  isVisible Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder, id])
+}
+
+model Video {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(255)
+  url       String   @db.VarChar(500)
+  vertical  Boolean  @default(true)
+  isVisible Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder, id])
+}
+
+model ComparisonRow {
+  id             Int      @id @default(autoincrement())
+  feature        String   @db.VarChar(255)
+  category       String   @db.VarChar(80)
+  purifrezeText  String   @db.VarChar(500)
+  garrafonesText String   @db.VarChar(500)
+  isVisible      Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([sortOrder, id])
+}
+
+model FaqItem {
+  id        Int      @id @default(autoincrement())
+  question  String   @db.Text
+  answer    String   @db.Text
+  isVisible Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder, id])
 }
 
 enum BlogPostStatus {
