@@ -47,7 +47,19 @@ export class BlogService {
   }
 
   async create(dto: SaveBlogPostDto) {
-    return this.prisma.blogPost.create({ data: this.data(dto) });
+    const data = this.data(dto);
+    const slug = await this.uniqueSlug(data.slug);
+    return this.prisma.blogPost.create({ data: { ...data, slug } });
+  }
+
+  private async uniqueSlug(base: string): Promise<string> {
+    let candidate = base;
+    let suffix = 2;
+    while (await this.prisma.blogPost.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+      candidate = `${base}-${suffix}`.slice(0, 255);
+      suffix += 1;
+    }
+    return candidate;
   }
 
   async update(id: number, dto: SaveBlogPostDto) {
