@@ -1,15 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateVideoDto } from './dto/create-video.dto';
+import { CreateVideoDto, videoPlacements, type VideoPlacement } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 
 @Injectable()
 export class VideosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
+  findAll(placement?: string) {
+    const requestedPlacement = videoPlacements.includes(placement as VideoPlacement)
+      ? (placement as VideoPlacement)
+      : undefined;
     return this.prisma.video.findMany({
+      where: requestedPlacement ? { placement: requestedPlacement } : undefined,
       orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
     });
   }

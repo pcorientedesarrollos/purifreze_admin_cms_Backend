@@ -1,4 +1,5 @@
-import { IsBoolean, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { videoPlacements, type VideoPlacement } from './create-video.dto';
 
 export class UpdateVideoDto {
   @IsOptional()
@@ -10,6 +11,10 @@ export class UpdateVideoDto {
   @IsString()
   @MaxLength(500)
   url?: string;
+
+  @IsOptional()
+  @IsIn(videoPlacements)
+  placement?: VideoPlacement;
 
   @IsOptional()
   @IsBoolean()

@@ -9,27 +9,32 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../auth/admin-auth.guard';
-import { CreateVideoDto } from './dto/create-video.dto';
+import { CreateUseCardDto } from './dto/create-use-card.dto';
 import { ReorderDto } from './dto/reorder.dto';
-import { UpdateVideoDto } from './dto/update-video.dto';
-import { VideosService } from './videos.service';
+import { UpdateUseCardDto } from './dto/update-use-card.dto';
+import { UseCardsService } from './use-cards.service';
 
-@Controller('videos')
-export class VideosController {
-  constructor(private readonly service: VideosService) {}
+@Controller('use-cards')
+export class UseCardsController {
+  constructor(private readonly service: UseCardsService) {}
 
   @Get()
-  findAll(@Query('placement') placement?: string) {
-    return this.service.findAll(placement);
+  findPublic() {
+    return this.service.listPublic();
+  }
+
+  @Get('admin')
+  @UseGuards(AdminAuthGuard)
+  findAdmin() {
+    return this.service.listAdmin();
   }
 
   @Post()
   @UseGuards(AdminAuthGuard)
-  create(@Body() dto: CreateVideoDto) {
+  create(@Body() dto: CreateUseCardDto) {
     return this.service.create(dto);
   }
 
@@ -42,10 +47,7 @@ export class VideosController {
 
   @Patch(':id')
   @UseGuards(AdminAuthGuard)
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateVideoDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUseCardDto) {
     return this.service.update(id, dto);
   }
 

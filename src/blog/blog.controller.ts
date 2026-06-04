@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AdminAuthGuard } from '../auth/admin-auth.guard';
 import { BlogService } from './blog.service';
 import { SaveBlogPostDto } from './dto/blog-post.dto';
@@ -51,5 +51,12 @@ export class BlogController {
   @Post('admin/posts/:id/unpublish')
   unpublish(@Param('id', ParseIntPipe) id: number) {
     return this.blog.unpublish(id);
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @Delete('admin/posts/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.blog.remove(id);
   }
 }

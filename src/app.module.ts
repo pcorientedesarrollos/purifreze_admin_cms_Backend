@@ -9,6 +9,7 @@ import { FaqItemsModule } from './faq-items/faq-items.module';
 import { MediaModule } from './media/media.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TestimonialsModule } from './testimonials/testimonials.module';
+import { UseCardsModule } from './use-cards/use-cards.module';
 import { VideosModule } from './videos/videos.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { VideosModule } from './videos/videos.module';
     FaqItemsModule,
     MediaModule,
     TestimonialsModule,
+    UseCardsModule,
     VideosModule,
   ],
   controllers: [AppController],

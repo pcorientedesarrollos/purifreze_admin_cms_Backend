@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { BlogPostStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { validateBlocks } from './blog-blocks';
@@ -6,6 +6,8 @@ import { SaveBlogPostDto } from './dto/blog-post.dto';
 
 @Injectable()
 export class BlogService {
+  private readonly logger = new Logger(BlogService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async listPublished(page = 1, pageSize = 9) {
@@ -92,6 +94,25 @@ export class BlogService {
       where: { id },
       data: { status: BlogPostStatus.DRAFT, publishedAt: null },
     });
+  }
+
+  async remove(id: number) {
+    try {
+      await this.prisma.blogPost.delete({ where: { id } });
+      this.logger.log(`Artículo eliminado correctamente. id=${id}`);
+    } catch (error) {
+      this.logger.error(
+        `Error al eliminar artículo. id=${id}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('El artículo no existe.');
+      }
+      throw error;
+    }
   }
 
   private data(dto: SaveBlogPostDto): Prisma.BlogPostUncheckedCreateInput {
