@@ -1,0 +1,122 @@
+### Test Backend: SEO + Blog extendido
+### Ejecutar con REST Client en VS Code o copiar a Postman
+
+@baseUrl = http://localhost:3000
+
+###
+# 1. Crear SEO para home
+PUT {{baseUrl}}/seo
+Content-Type: application/json
+
+{
+  "entityType": "page",
+  "entityId": "/",
+  "metaTitle": "Purifreze — Agua purificada sin garrafones",
+  "metaDesc": "Sistema de purificación de agua en casa. Sin cargar garrafones, sin químicos. Mantenimiento incluido en Yucatán.",
+  "ogImage": "/assets/og-home.jpg",
+  "noIndex": false,
+  "noFollow": false
+}
+
+###
+# 2. Obtener SEO de home
+GET {{baseUrl}}/seo/page/%2F
+
+###
+# 3. Listar todo el SEO de páginas
+GET {{baseUrl}}/seo/page
+
+###
+# 4. Crear artículo de blog con campos nuevos
+POST {{baseUrl}}/blog
+Content-Type: application/json
+
+{
+  "title": "Agua Viva en Yucatán",
+  "excerpt": "5 razones para dejar de consumir agua muerta",
+  "coverColor": "#3a2e6e",
+  "coverIcon": "flask",
+  "category": "Agua",
+  "authorName": "Renata Cámara",
+  "authorInitials": "RC",
+  "blocks": [
+    {
+      "id": "1",
+      "type": "paragraph",
+      "data": { "text": "La desinfección cuántica se refiere a tecnologías innovadoras que utilizan principios de la mecánica cuántica para eliminar microorganismos del agua sin alterar su estructura natural." }
+    },
+    {
+      "id": "2",
+      "type": "heading",
+      "data": { "text": "Beneficios de consumir agua viva", "level": 2 }
+    },
+    {
+      "id": "3",
+      "type": "list",
+      "data": { "items": ["Mantiene los minerales esenciales", "Mejora la hidratación celular", "Sin cloro residual"] }
+    },
+    {
+      "id": "4",
+      "type": "quote",
+      "data": { "text": "El agua no solo debe estar limpia: debe estar viva." }
+    },
+    {
+      "id": "5",
+      "type": "callout",
+      "data": { "text": "¿Tienes dudas sobre la calidad del agua en tu zona? Agenda una prueba gratuita." }
+    }
+  ]
+}
+
+###
+# 5. Verificar que readMin se calculó automáticamente
+GET {{baseUrl}}/blog
+
+###
+# 6. Crear SEO para el artículo de blog
+PUT {{baseUrl}}/seo
+Content-Type: application/json
+
+{
+  "entityType": "blog_post",
+  "entityId": "agua-viva-en-yucatan",
+  "metaTitle": "Agua Viva en Yucatán — 5 razones para dejar el agua muerta",
+  "metaDesc": "Descubre por qué el agua viva mejora tu bienestar y cómo la desinfección cuántica de Purifreze elimina microorganismos en Yucatán.",
+  "keywords": "agua viva yucatán, desinfección cuántica, purificación agua",
+  "ogTitle": "Agua Viva en Yucatán | Purifreze",
+  "ogDesc": "Descubre por qué el agua viva mejora tu bienestar.",
+  "ogImage": "/uploads/agua-viva-cover.jpg"
+}
+
+###
+# 7. Obtener SEO del artículo
+GET {{baseUrl}}/seo/blog_post/agua-viva-en-yucatan
+
+###
+# 8. Listar todo el SEO de blog
+GET {{baseUrl}}/seo/blog_post
+
+###
+# 9. Crear segundo artículo con imagen tradicional (sin ícono)
+POST {{baseUrl}}/blog
+Content-Type: application/json
+
+{
+  "title": "Cómo prolongar la vida de tu cámara frigorífica",
+  "excerpt": "Guía práctica para el mantenimiento de equipos de refrigeración industrial y ahorro energético.",
+  "coverImageUrl": "/uploads/camara-frigorifica.jpg",
+  "category": "Equipo",
+  "authorName": "Jorge Méndez",
+  "authorInitials": "JM",
+  "blocks": [
+    {
+      "id": "1",
+      "type": "paragraph",
+      "data": { "text": "El mantenimiento preventivo es clave para extender la vida útil de tu cámara frigorífica." }
+    }
+  ]
+}
+
+###
+# 10. Eliminar SEO de prueba
+DELETE {{baseUrl}}/seo/page/%2F

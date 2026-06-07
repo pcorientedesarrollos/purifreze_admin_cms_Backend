@@ -116,13 +116,40 @@ export class BlogService {
   }
 
   private data(dto: SaveBlogPostDto): Prisma.BlogPostUncheckedCreateInput {
+    const blocks = validateBlocks(dto.blocks);
+    const readMin = this.calculateReadTime(dto.title, dto.excerpt, blocks);
+    
     return {
       title: dto.title.trim(),
       slug: slugify(dto.title),
       excerpt: dto.excerpt.trim(),
       coverImageUrl: dto.coverImageUrl?.trim() || null,
-      blocks: validateBlocks(dto.blocks) as unknown as Prisma.InputJsonValue,
+      coverColor: dto.coverColor?.trim() || null,
+      coverIcon: dto.coverIcon?.trim() || null,
+      category: dto.category?.trim() || null,
+      authorName: dto.authorName?.trim() || null,
+      authorInitials: dto.authorInitials?.trim() || null,
+      readMin,
+      blocks: blocks as unknown as Prisma.InputJsonValue,
     };
+  }
+
+  private calculateReadTime(title: string, excerpt: string, blocks: any[]): number {
+    const titleWords = title.trim().match(/\S+/g)?.length || 0;
+    const excerptWords = excerpt.trim().match(/\S+/g)?.length || 0;
+    
+    let blockWords = 0;
+    for (const block of blocks) {
+      if (block.data?.text) {
+        blockWords += block.data.text.trim().match(/\S+/g)?.length || 0;
+      }
+      if (block.data?.items && Array.isArray(block.data.items)) {
+        blockWords += block.data.items.join(' ').trim().match(/\S+/g)?.length || 0;
+      }
+    }
+    
+    const totalWords = titleWords + excerptWords + blockWords;
+    return Math.max(1, Math.round(totalWords / 200));
   }
 
   private async requirePost(id: number) {
@@ -138,7 +165,20 @@ export class BlogService {
 
   private cardSelect() {
     return {
-      id: true, title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, updatedAt: true,
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      coverImageUrl: true,
+      coverColor: true,
+      coverIcon: true,
+      category: true,
+      authorName: true,
+      authorInitials: true,
+      views: true,
+      readMin: true,
+      publishedAt: true,
+      updatedAt: true,
     };
   }
 }

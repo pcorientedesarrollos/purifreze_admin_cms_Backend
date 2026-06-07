@@ -86,7 +86,22 @@ model BlogPost {
   title         String                 @db.VarChar(255)
   slug          String                 @unique @db.VarChar(255)
   excerpt       String                 @db.Text
+  
+  // Cover: imagen tradicional O ícono flat
   coverImageUrl String?                @db.VarChar(500)
+  coverColor    String?                @db.VarChar(7)
+  coverIcon     String?                @db.VarChar(20)
+  
+  // Organización
+  category      String?                @db.VarChar(50)
+  authorName    String?                @db.VarChar(100)
+  authorInitials String?               @db.VarChar(5)
+  
+  // Stats
+  views         Int                    @default(0)
+  readMin       Int?
+  
+  // Contenido
   blocks        Json
   status        BlogPostStatus         @default(DRAFT)
   publishedAt   DateTime?
@@ -95,6 +110,7 @@ model BlogPost {
   redirects     BlogPostSlugRedirect[]
 
   @@index([status, publishedAt])
+  @@index([category])
 }
 
 model BlogPostSlugRedirect {
@@ -103,6 +119,36 @@ model BlogPostSlugRedirect {
   postId    Int
   createdAt DateTime @default(now())
   post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model SeoMetadata {
+  id          Int      @id @default(autoincrement())
+  entityType  String   @db.VarChar(50)
+  entityId    String   @db.VarChar(100)
+  
+  // Meta tags básicos
+  metaTitle   String?  @db.VarChar(60)
+  metaDesc    String?  @db.VarChar(160)
+  keywords    String?  @db.VarChar(200)
+  
+  // Open Graph
+  ogTitle     String?  @db.VarChar(60)
+  ogDesc      String?  @db.VarChar(160)
+  ogImage     String?  @db.VarChar(500)
+  
+  // Twitter Cards
+  twitterCard String?  @db.VarChar(20)
+  
+  // Técnico
+  canonicalUrl String?  @db.VarChar(500)
+  noIndex      Boolean  @default(false)
+  noFollow     Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([entityType, entityId])
+  @@index([entityType])
 }
 
 model AdminUser {

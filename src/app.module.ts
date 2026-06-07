@@ -8,6 +8,7 @@ import { ComparisonRowsModule } from './comparison-rows/comparison-rows.module';
 import { FaqItemsModule } from './faq-items/faq-items.module';
 import { MediaModule } from './media/media.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SeoModule } from './seo/seo.module';
 import { TestimonialsModule } from './testimonials/testimonials.module';
 import { UseCardsModule } from './use-cards/use-cards.module';
 import { VideosModule } from './videos/videos.module';
@@ -21,6 +22,7 @@ import { VideosModule } from './videos/videos.module';
     ComparisonRowsModule,
     FaqItemsModule,
     MediaModule,
+    SeoModule,
     TestimonialsModule,
     UseCardsModule,
     VideosModule,

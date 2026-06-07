@@ -31,6 +31,12 @@ export function validateBlocks(blocks: BlogBlockDto[]): BlogBlockDto[] {
     if (block.type === 'image') {
       return { ...block, data: { url: url(data.url, 'Image URL'), alt: text(data.alt, 'Image alt text') } };
     }
+    if (block.type === 'quote') {
+      return { ...block, data: { text: text(data.text, 'Quote') } };
+    }
+    if (block.type === 'callout') {
+      return { ...block, data: { text: text(data.text, 'Callout') } };
+    }
     throw new BadRequestException('Unsupported blog block.');
   });
 }
