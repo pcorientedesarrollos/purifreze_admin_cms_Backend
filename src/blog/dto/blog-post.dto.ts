@@ -49,6 +49,11 @@ export class SaveBlogPostDto {
 
   @IsOptional()
   @IsString()
+  @IsIn(['small', 'medium', 'large'])
+  coverSize?: 'small' | 'medium' | 'large' | null;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(50)
   category?: string | null;
 

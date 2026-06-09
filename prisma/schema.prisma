@@ -91,6 +91,7 @@ model BlogPost {
   coverImageUrl String?                @db.VarChar(500)
   coverColor    String?                @db.VarChar(7)
   coverIcon     String?                @db.VarChar(20)
+  coverSize     String?                @db.VarChar(10)
   
   // Organización
   category      String?                @db.VarChar(50)
